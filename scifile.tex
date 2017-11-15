@@ -1,0 +1,208 @@
+\documentclass[11pt]{article}
+\usepackage{scicite}
+\usepackage{amsmath,amsfonts,amssymb,amsthm,epsfig,epstopdf,titling,url,array}
+
+\theoremstyle{plain}
+\newtheorem{thm}{Theorem}[section]
+\newtheorem{lem}[thm]{Lemma}
+\newtheorem{prop}[thm]{Proposition}
+\newtheorem*{cor}{Corollary}
+
+\theoremstyle{definition}
+\newtheorem{defn}{Definition}[section]
+\newtheorem{conj}{Conjecture}[section]
+\newtheorem{exmp}{Example}[section]
+
+\theoremstyle{remark}
+\newtheorem*{rem}{Remark}
+\newtheorem*{note}{Note}
+
+
+
+
+
+
+\topmargin 0.0cm
+\oddsidemargin 0.2cm
+\textwidth 16cm 
+\textheight 21cm
+\footskip 1.0cm
+
+\newenvironment{sciabstract}{%
+\begin{quote} \bf}
+{\end{quote}}
+\renewcommand\refname{References and Notes}
+
+\newcounter{lastnote}
+\newenvironment{scilastnote}{%
+\setcounter{lastnote}{\value{enumiv}}%
+\addtocounter{lastnote}{+1}%
+\begin{list}%
+{\arabic{lastnote}.}
+{\setlength{\leftmargin}{.22in}}
+{\setlength{\labelsep}{.5em}}}
+{\end{list}}
+
+
+% Include your paper's title here
+
+\title{Wikipedia Recommender System with serendipity} 
+
+
+\author
+    {
+      Barszezak Yoann,Bricout Raphael, David Nicolas, Dupre Remi,\\
+      Fouche Aziz, Gourdel Garance, Kaddar Younesse, Mallem Maher,\\
+      \\
+      \normalsize{Department of Computer science, ENS Paris-Saclay}\\
+    }
+
+ 
+
+    \date{November 2017}
+
+
+
+%%%%%%%%%%%%%%%%% END OF PREAMBLE %%%%%%%%%%%%%%%%
+
+
+
+\begin{document} 
+
+% Double-space the manuscript.
+
+\baselineskip10pt
+
+% Make the title.
+
+\maketitle 
+
+
+
+% Place your abstract within the special {sciabstract} environment.
+
+\begin{sciabstract}
+  TO DO : Abstract
+\end{sciabstract}
+
+
+
+
+
+\section{Introduction}
+
+
+\section{Problem Overview}
+
+
+
+
+\section{Retrivial of Candidate articles}
+
+\subsection{Neighbourhood}
+
+Let's try to understand the idea of proximity between two articles. One way to do it is to introduce a potential function telling us the proximity between two articles.
+
+\subsubsection{Naive Similarity}
+
+Our attempt to define this potential function uses the set of categories linked to an article, it is called the similarity.
+
+
+
+
+
+\vspace*{5mm}
+\begin{defn}
+  Let $A_1$ and $A_2$ be two articles. We call $C_1$ (resp. $C_2$) the set of categories linked to $A_1$ (resp. $A_2$).
+  We define the similarity of $A_1$ and $A_2$ the following quantity:\\
+  \begin{equation*}
+    S_W(A_1,A_2) = \frac{Card(C_1 \cap C_2)}{min(Card(C_1),Card(C_2))}
+  \end{equation*}
+\end{defn}
+
+\begin{rem}
+  $\forall A_1\: A_2,\; S_W(A_1,A_2) \in [0,1]$
+\end{rem}
+
+\vspace*{5mm}
+With this definition in mind, let's seek for an output of the ``Retrivial of Candidate Articles''.
+
+
+Let's call $A_c$ the current article.
+Given an subinterval $I$ of $[0,1]$ (define in the serendipity subsection), one way to find candidate articles will be to pick randomly $N$ articles $(A_i)_{1 \leq i \leq N}$ such that:
+\begin{center}
+  $\forall i \; S_W(A_c,A_i) \in I$
+\end{center}
+
+\vspace*{5mm}
+This approach should work as long as the similarity is precise (in the case of wikipedia, it means as long as an article have a significant number of categories). Unfortunately, some articles are poorly cateorised. Thus, it is not always accurate to use this object.\\
+Therefore, an other approach is needed.
+
+
+
+
+
+
+\subsubsection{Ontology basis}
+
+
+-Modele general
+-Utilisation
+-YAGO
+
+\subsection{serendipity}
+
+\subsubsection{Similarity}
+
+-choix de I
+
+\subsubsection{Ontology}
+
+-parcours de l'Ontology
+
+
+\section{Candidate Ranking}
+
+\subsection{possible input in neural network}
+\subsubsection{Category vector}
+\subsubsection{Word2Vect and Wikidata}
+
+\subsection{Wide and deep Neural Network}
+\subsubsection{Wide : memorization/focus}
+\subsubsection{Deep : generalization/serendipity}
+
+\section{System architecture}
+
+
+\section{Exprimentation}
+
+
+\section{State of the Art}
+
+
+
+\bibliography{scibib}
+
+\bibliographystyle{Science}
+
+\end{document}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
