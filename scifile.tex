@@ -1,6 +1,21 @@
 \documentclass[11pt]{article}
 \usepackage{scicite}
-\usepackage{amsmath,amsfonts,amssymb,amsthm,epsfig,epstopdf,titling,url,array}
+
+% Default packages
+\usepackage{amsmath, amsfonts, amssymb, amsthm, epsfig, epstopdf, titling, url, array}
+
+% Because it is convenient
+\usepackage{hyperref}
+
+% To insert tables
+\usepackage{array}
+
+% We might need some code insertion
+\usepackage{minted}
+
+% Also indent first paragraph of a section
+\usepackage{indentfirst}
+
 
 \theoremstyle{plain}
 \newtheorem{thm}{Theorem}[section]
@@ -19,28 +34,24 @@
 
 
 
-
-
-
 \topmargin 0.0cm
 \oddsidemargin 0.2cm
 \textwidth 16cm 
 \textheight 21cm
 \footskip 1.0cm
 
-\newenvironment{sciabstract}{%
+\newenvironment{sciabstract}{
 \begin{quote} \bf}
 {\end{quote}}
 \renewcommand\refname{References and Notes}
 
 \newcounter{lastnote}
-\newenvironment{scilastnote}{%
-\setcounter{lastnote}{\value{enumiv}}%
-\addtocounter{lastnote}{+1}%
-\begin{list}%
-{\arabic{lastnote}.}
-{\setlength{\leftmargin}{.22in}}
-{\setlength{\labelsep}{.5em}}}
+\newenvironment{scilastnote}{\setcounter{lastnote}{\value{enumiv}}
+\addtocounter{lastnote}{+1}
+\begin{list}
+  {\arabic{lastnote}.}
+  {\setlength{\leftmargin}{.22in}}
+  {\setlength{\labelsep}{.5em}}}
 {\end{list}}
 
 
@@ -51,8 +62,8 @@
 
 \author
     {
-      Barszezak Yoann,Bricout Raphael, David Nicolas, Dupre Remi,\\
-      Fouche Aziz, Gourdel Garance, Kaddar Younesse, Mallem Maher,\\
+      Barszezak Yoann, Bricout Rapha\"el, David Nicolas, Dupr\'e R\'emi,\\
+      Fouch\'e Aziz, Gourdel Garance, Kaddar Younesse, Mallem Maher,\\
       \\
       \normalsize{Department of Computer science, ENS Paris-Saclay}\\
     }
@@ -107,12 +118,9 @@ Let's try to understand the idea of proximity between two articles. One way to d
 
 Our attempt to define this potential function uses the set of categories linked to an article, it is called the similarity.
 
-
-
-
-
 \vspace*{5mm}
 \begin{defn}
+  \label{definition:S_w}
   Let $A_1$ and $A_2$ be two articles. We call $C_1$ (resp. $C_2$) the set of categories linked to $A_1$ (resp. $A_2$).
   We define the similarity of $A_1$ and $A_2$ the following quantity:\\
   \begin{equation*}
@@ -140,9 +148,6 @@ Therefore, an other approach is needed.
 
 
 
-
-
-
 \subsubsection{Ontology basis}
 
 
@@ -150,7 +155,7 @@ Therefore, an other approach is needed.
 -Utilisation
 -YAGO
 
-\subsection{serendipity}
+\subsection{Serendipity}
 
 \subsubsection{Similarity}
 
@@ -163,7 +168,7 @@ Therefore, an other approach is needed.
 
 \section{Candidate Ranking}
 
-\subsection{possible input in neural network}
+\subsection{Possible input in neural network}
 \subsubsection{Category vector}
 \subsubsection{Word2Vect and Wikidata}
 
@@ -171,10 +176,58 @@ Therefore, an other approach is needed.
 \subsubsection{Wide : memorization/focus}
 \subsubsection{Deep : generalization/serendipity}
 
+\newpage
+
 \section{System architecture}
 
+\begin{figure}[h!]
+	\centering
+    \includegraphics[width=400pt]{diagram.png}
+    \caption{Global software's structure}
+    \label{arch_glo}
+\end{figure}
 
-\section{Exprimentation}
+Blue arrows represent system's input, orange arrow is for the output. Green arrows explains how data is exchanged internally between the different modules. Arrowed labeling is defined as follows :
+\begin{itemize}
+\item \textbf{1)} \textit{Extraction of all links mentioned in the article (without the links of header, side, and footer)}.
+\item \textbf{2)} \textit{Visit of article neighborhood (it may be 2-hop neighboring) to enhance serendipity, selection of best neighbors based on general criteria}.
+\item \textbf{3)} \textit{Selected articles are injected into the recommendation module}.
+\item \textbf{4), 5)} \textit{Recommendation module feeds the user-specific neural network with selected articles to sort them}.
+\item \textbf{6)} \textit{Best articles are re-injected into the page, to be recommended to the user}.
+\item \textbf{7)} \textit{User gives its feedback on proposed articles, reactions are stored locally}.
+\item \textbf{8)} \textit{Thanks to user feedback, network structure is updated to fit user's interests}.
+\end{itemize}
+
+\subsection{User interface}
+We started the implementation of an in-browser plugin for wikipedia suggestion.
+The goal of this plugin is to insert an interface in any wikipedia page that allows the user to give his opinion about this page. The plugin will keep an user profile up to date and suggest wikipedia pages to the user that it considers relevant for this user.
+
+As our goal is to introduce serendipity in such a system, we also added a cursor to parametrize a level of serendipity. Bigger this parameter is set, the less the user will be suggested pages about a topic he already eared of.
+
+\subsection{Wikipedia API's}
+% a few words about what both api provide
+
+
+\section{Experimentation}
+\subsection{Similarity}
+Using wikipedia's official api, we were able to calculate the naive similarity between two pages defined at \ref{definition:S_w}. For example, the following code will prompt $0.6364$, the similarity processed between the page about Jimi Hendrix (of id 16095) and Michael Jackson (of id 14995351).
+  \mint{javascript}|apiMod.distance(16095, 14995351, console.log); // "similarity(Michael J.,  Jimi H.)"|
+  
+Thus, we were able to experiment this distance over a set of webpages. We can thus qualitatively test this algorithm. It is not really hard to get examples where this calculation is unrelevant (for example, Michael Jackson is closer to France than Paris, cf. Figure \ref{fig:similarity}), but still, on many examples, it gives a trend that fits with the intuition.
+
+\begin{figure}
+    \caption{Comparison of some pages of wikipedia (cf definition \ref{definition:S_w})}
+    \label{fig:similarity}
+	\centering
+	\begin{tabular}{c|c|c}
+		Page 1			&	Page 2			&	Similarity \\
+		\hline\hline
+		Michael Jackson	&	Jimi Hendrix	&	0.6364	\\
+		Michael Jackson	&	France			&	0.8600	\\
+		Paris			&	France			&	0.6842	\\
+		Luxembourg		&	France			&	0.5416	\\
+  \end{tabular}
+\end{figure}
 
 
 \section{State of the Art}
@@ -186,23 +239,3 @@ Therefore, an other approach is needed.
 \bibliographystyle{Science}
 
 \end{document}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
