@@ -3,7 +3,9 @@
 
 % Default packages
 \usepackage{amsmath, amsfonts, amssymb, amsthm, epsfig, epstopdf, titling, url, array}
-
+\usepackage{algorithm} 
+\usepackage{algorithmic} 
+\usepackage{graphicx}
 % Because it is convenient
 \usepackage{hyperref}
 
@@ -99,7 +101,6 @@
 
 
 
-
 \section{Introduction}
 
 
@@ -118,28 +119,31 @@ Let's try to understand the idea of proximity between two articles. One way to d
 
 Our attempt to define this potential function uses the set of categories linked to an article, it is called the similarity.
 
+
+
+
+
 \vspace*{5mm}
 \begin{defn}
-  \label{definition:S_w}
-  Let $A_1$ and $A_2$ be two articles. We call $C_1$ (resp. $C_2$) the set of categories linked to $A_1$ (resp. $A_2$).
-  We define the similarity of $A_1$ and $A_2$ the following quantity:\\
+  Let $a_1$ and $a_2$ be two articles. We call $C_1$ (resp. $C_2$) the set of categories linked to $a_1$ (resp. $a_2$).
+  We define the similarity of $a_1$ and $a_2$ the following quantity:\\
   \begin{equation*}
-    S_W(A_1,A_2) = \frac{Card(C_1 \cap C_2)}{min(Card(C_1),Card(C_2))}
+    S_W(a_1,a_2) = \frac{Card(C_1 \cap C_2)}{min(Card(C_1),Card(C_2))}
   \end{equation*}
 \end{defn}
 
 \begin{rem}
-  $\forall A_1\: A_2,\; S_W(A_1,A_2) \in [0,1]$
+  $\forall a_1\: a_2,\; S_W(a_1,a_2) \in [0,1]$
 \end{rem}
 
 \vspace*{5mm}
 With this definition in mind, let's seek for an output of the ``Retrivial of Candidate Articles''.
 
 
-Let's call $A_c$ the current article.
-Given an subinterval $I$ of $[0,1]$ (define in the serendipity subsection), one way to find candidate articles will be to pick randomly $N$ articles $(A_i)_{1 \leq i \leq N}$ such that:
+Let's call $a_c$ the current article.
+Given an subinterval $I$ of $[0,1]$ (define in the serendipity subsection), one way to find candidate articles will be to pick randomly $N$ articles $(a_i)_{1 \leq i \leq N}$ such that:
 \begin{center}
-  $\forall i \; S_W(A_c,A_i) \in I$
+  $\forall i \; S_W(a_c,a_i) \in I$
 \end{center}
 
 \vspace*{5mm}
@@ -148,14 +152,62 @@ Therefore, an other approach is needed.
 
 
 
+
+
+
 \subsubsection{Ontology basis}
 
+An other way to solve this problem is to use an Ontology on the wikipedia articles.
 
--Modele general
--Utilisation
--YAGO
+\vspace*{5mm}
+\begin{defn}
+  Let $A$ a set of theme. We call $\mathbb{O}$ an Ontology over $A$ a directed tree in which :
+  \begin{itemize}
+  \item $ Node(\mathbb{O}) = A$
+  \item if $t_1$ is a sub-theme of $t_2$ then $(t_1,t_2) \in Edge(\mathbb{O})$
+  \end{itemize}
+\end{defn}
 
-\subsection{Serendipity}
+\vspace*{5mm}
+
+\begin{rem}
+  The relation ``is a sub-theme'' is not transitive.
+\end{rem}
+
+\begin{figure}[!h]
+	\centering
+    \includegraphics[scale = 0.3]{ExOntology.pdf}
+    \caption{Ontology over number}
+\end{figure}
+
+This kind of strucure is available on a YAGO software (Yet An Other Great Ontology). Thus, the building of such an ontology on wikipedia is not required. In the following, we will suppose that every theme in YAGO matches with an article on wikipedia. \\
+Now that we have in mind the definition of ontology, let's try to find a way of using it to select articles.\\
+
+
+\begin{algorithm}
+  \caption{Calculate $A^*$ the selected articles}
+  \begin{algorithmic}
+    \REQUIRE $wish \in \{specific , general\}$ , $p_1 \: ,p_2 \in ]0,1[ $, $N \in \mathbb{N}$ , $a_c \in A$
+    \STATE $A^* \leftarrow \emptyset$
+    \WHILE {$ Card(A) \leq N $}
+    \IF {$wish = specific$}
+    \STATE $ r \leftarrow geometric.random(p_1)$
+    \STATE Ask YAGO a for a random son of depth r from $a_c$
+    \STATE $ A^* \leftarrow A^* \cup \{a_{YAGO}\}$
+    \ELSE
+    \STATE $ r \leftarrow geometric.random(p_2)$
+    \STATE Ask YAGO a for a random father of depth r from $a_c$
+    \STATE $ A^*  \leftarrow A^* \cup \{a_{YAGO}\}$ 
+    \ENDIF
+    \ENDWHILE
+    \RETURN $A^*$
+  \end{algorithmic}
+\end{algorithm}
+
+-choix de p1 et p2 dans serandipity
+
+\newpage
+\subsection{serendipity}
 
 \subsubsection{Similarity}
 
@@ -165,10 +217,9 @@ Therefore, an other approach is needed.
 
 -parcours de l'Ontology
 
-
 \section{Candidate Ranking}
 
-\subsection{Possible input in neural network}
+\subsection{possible input in neural network}
 \subsubsection{Category vector}
 \subsubsection{Word2Vect and Wikidata}
 
@@ -176,9 +227,12 @@ Therefore, an other approach is needed.
 \subsubsection{Wide : memorization/focus}
 \subsubsection{Deep : generalization/serendipity}
 
+
 \newpage
 
 \section{System architecture}
+
+First, we give a global diagram to expose interactions between the user interface, \textit{Wikipedia} pages, modules and \textit{Wikipedia}'s APIs. 
 
 \begin{figure}[h!]
 	\centering
@@ -197,6 +251,23 @@ Blue arrows represent system's input, orange arrow is for the output. Green arro
 \item \textbf{7)} \textit{User gives its feedback on proposed articles, reactions are stored locally}.
 \item \textbf{8)} \textit{Thanks to user feedback, network structure is updated to fit user's interests}.
 \end{itemize}
+
+\subsection{Zoom on recommendation method}
+
+\begin{figure}[h!]
+	\centering
+    \includegraphics[width=400pt]{diagram_zoom.png}
+    \caption{How recommendation method works}
+    \label{arch_glo}
+\end{figure}
+
+\subsubsection{Triple filtering}
+
+The main challenge which has been to be faced is the HTTP requests' efficiency problem. Indeed, the first idea is to get all page links, visit them all and sort them using some pertinence criteria. It was nevertheless technically impossible ; due to the size of HTTP requests, even performed asynchronously, the answer time was huge. \\
+
+The solution developed was to introduce a triple filtering, which consists in three passes going more and more complex and time-expensive. It allowed the module to be able to explore pages to \textit{2-hops} from the original page
+
+\subsubsection{Iterative triple filtering}
 
 \subsection{User interface}
 We started the implementation of an in-browser plugin for wikipedia suggestion.
