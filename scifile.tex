@@ -95,8 +95,8 @@
 % Place your abstract within the special {sciabstract} environment.
 
 \begin{sciabstract}
-  TO DO : Abstract
-  Younesse : Github -> Overleaf sync test
+  TO DO : Abstract\\
+  Younesse : Github -> Overleaf sync test\\
   Younesse : Overleaf -> Github sync test
 \end{sciabstract}
 
@@ -111,9 +111,9 @@
 
 
 
-\section{Retrivial of Candidate articles}
+\section{Retrieval of Candidate articles}
 
-\subsection{Neighbourhood}
+\subsection{Neighborhood}
 
 Let's try to understand the idea of proximity between two articles. One way to do it is to introduce a potential function telling us the proximity between two articles.
 
@@ -139,7 +139,7 @@ Our attempt to define this potential function uses the set of categories linked 
 \end{rem}
 
 \vspace*{5mm}
-With this definition in mind, let's seek for an output of the ``Retrivial of Candidate Articles''.
+With this definition in mind, let's seek for an output of the ``Retrieval of Candidate Articles''.
 
 
 Let's call $a_c$ the current article.
@@ -149,7 +149,7 @@ Given an subinterval $I$ of $[0,1]$ (define in the serendipity subsection), one 
 \end{center}
 
 \vspace*{5mm}
-This approach should work as long as the similarity is precise (in the case of wikipedia, it means as long as an article have a significant number of categories). Unfortunately, some articles are poorly cateorised. Thus, it is not always accurate to use this object.\\
+This approach should work as long as the similarity is precise (in the case of Wikipedia, it means as long as an article have a significant number of categories). Unfortunately, some articles are poorly categorized. Thus, it is not always accurate to use this object.\\
 Therefore, an other approach is needed.
 
 
@@ -159,7 +159,7 @@ Therefore, an other approach is needed.
 
 \subsubsection{Ontology basis}
 
-An other way to solve this problem is to use an Ontology on the wikipedia articles.
+An other way to solve this problem is to use an Ontology on the Wikipedia articles.
 
 \vspace*{5mm}
 \begin{defn}
@@ -182,7 +182,7 @@ An other way to solve this problem is to use an Ontology on the wikipedia articl
     \caption{Ontology over number}
 \end{figure}
 
-This kind of strucure is available on a YAGO software (Yet An Other Great Ontology). Thus, the building of such an ontology on wikipedia is not required. In the following, we will suppose that every theme in YAGO matches with an article on wikipedia. \\
+This kind of structure is available on a YAGO software (Yet An Other Great Ontology). Thus, the building of such an ontology on Wikipedia is not required. In the following, we will suppose that every theme in YAGO matches with an article on Wikipedia. \\
 Now that we have in mind the definition of ontology, let's try to find a way of using it to select articles.\\
 
 
@@ -206,7 +206,7 @@ Now that we have in mind the definition of ontology, let's try to find a way of 
   \end{algorithmic}
 \end{algorithm}
 
--choix de p1 et p2 dans serandipity
+-choix de p1 et p2 dans serendipity
 
 \newpage
 \subsection{serendipity}
@@ -234,7 +234,7 @@ Now that we have in mind the definition of ontology, let's try to find a way of 
 
 \section{System architecture}
 
-First, we give a global diagram to expose interactions between the user interface, \textit{Wikipedia} pages, modules and \textit{Wikipedia}'s APIs. 
+First, we give a global diagram to expose interactions between the user interface, \textit{Wikipedia} pages, modules and \textit{Wikipedia} APIs. 
 
 \begin{figure}[h!]
 	\centering
@@ -272,8 +272,8 @@ The solution developed was to introduce a triple filtering, which consists in th
 \subsubsection{Iterative triple filtering}
 
 \subsection{User interface}
-We started the implementation of an in-browser plugin for wikipedia suggestion.
-The goal of this plugin is to insert an interface in any wikipedia page that allows the user to give his opinion about this page. The plugin will keep an user profile up to date and suggest wikipedia pages to the user that it considers relevant for this user.
+We started the implementation of an in-browser plugin for Wikipedia suggestion.
+The goal of this plugin is to insert an interface in any Wikipedia page that allows the user to give his opinion about this page. The plugin will keep an user profile up to date and suggest Wikipedia pages to the user that it considers relevant for this user.
 
 As our goal is to introduce serendipity in such a system, we also added a cursor to parametrize a level of serendipity. Bigger this parameter is set, the less the user will be suggested pages about a topic he already eared of.
 
@@ -283,13 +283,13 @@ As our goal is to introduce serendipity in such a system, we also added a cursor
 
 \section{Experimentation}
 \subsection{Similarity}
-Using wikipedia's official api, we were able to calculate the naive similarity between two pages defined at \ref{definition:S_w}. For example, the following code will prompt $0.6364$, the similarity processed between the page about Jimi Hendrix (of id 16095) and Michael Jackson (of id 14995351).
+Using Wikipedia official api, we were able to calculate the naive similarity between two pages defined at \ref{definition:S_w}. For example, the following code will prompt $0.6364$, the similarity processed between the page about Jimi Hendrix (of id 16095) and Michael Jackson (of id 14995351).
   \mint{javascript}|apiMod.distance(16095, 14995351, console.log); // "similarity(Michael J.,  Jimi H.)"|
   
-Thus, we were able to experiment this distance over a set of webpages. We can thus qualitatively test this algorithm. It is not really hard to get examples where this calculation is unrelevant (for example, Michael Jackson is closer to France than Paris, cf. Figure \ref{fig:similarity}), but still, on many examples, it gives a trend that fits with the intuition.
+Thus, we were able to experiment this distance over a set of web pages. We can thus qualitatively test this algorithm. It is not really hard to get examples where this calculation is irrelevant (for example, Michael Jackson is closer to France than Paris, cf. Figure \ref{fig:similarity}), but still, on many examples, it gives a trend that fits with the intuition.
 
 \begin{figure}
-    \caption{Comparison of some pages of wikipedia (cf definition \ref{definition:S_w})}
+    \caption{Comparison of some pages of Wikipedia (cf definition \ref{definition:S_w})}
     \label{fig:similarity}
 	\centering
 	\begin{tabular}{c|c|c}
