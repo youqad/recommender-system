@@ -113,7 +113,9 @@ They usually consist in algorithms that, given user previous selections (content
 
 With statistical learning comes a natural approach to this problem : for each user \textit{John}, the system aims to train a model which tends to fit the user tastes, to be able to deliver good predictions. One of the easiest and most natural way to apply that is to find the users whose tastes are the closest to \textit{John}'s ones. Then, by simply watching at their advice on an asked product, this is easy to get an idea about how it will be likely to be appreciated by \textit{John}.
 
-Unfortunately, there are many limitations in this method. The main one is that, if there are not enough users in the system, and if there are many objects to rate, the intersection between users ratings is the empty set with a high probability. Furthermore, tastes are evolving. If a user has given a music five stars ten years ago, then there is no reason he still likes it that much. Finally, 
+Unfortunately, there are many limitations in this method. The main one is that, if there are not enough users in the system, and if there are many objects to rate, the intersection between users ratings is the empty set with a high probability. Furthermore, tastes are evolving. If a user has given a music five stars ten years ago, then there is no reason he still likes it that much. Finally, this approach implies to be able to define a metric on ratable objects, which can sometimes be very difficult, or even poorly relevant. \\
+
+Reinforcement learning with deep neural networks can overcome these drawbacks, by drastically moving the focal. Instead of 
 
 todo why choice of wikipedia\\
 
