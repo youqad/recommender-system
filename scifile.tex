@@ -101,13 +101,20 @@
 \end{sciabstract}
 
 
+\tableofcontents
 
 
 \section{Introduction}
 
 
 \section{Problem Overview}
-
+-Wikipedia
+-recommander system
+-serendipity (def)
+-questions : like/dislike, specific/general
+-NN
+-Implementation
+(at least)
 
 
 
@@ -210,19 +217,60 @@ Now that we have in mind the definition of ontology, let's try to find a way of 
 
 \newpage
 \subsection{serendipity}
+\subsection{Serendipity}
 
+In the previous algorithm, the set of candidate articles was chosen among the nearest neighbors in the ontology of YAGO.
+In order to recommand to the user articles far from its habits, we present here another way to find articles, depending on the 'serendipity' factor I.
+\begin{algorithm}
+  \caption{Calculate $A^*$ the selected articles}
+  \begin{algorithmic}
+    \REQUIRE $wish \in \{specific , general\}$ , $N \in \mathbb{N}$, $c \in \mathbb{N}$, $a_c\in A$
+    \STATE $A^* \leftarrow \emptyset$
+    \WHILE {$Card(A^*)\leq N$}
+    \WHILE {$Card(Cat_{YAGO}(a))\leq c$}
+    \STATE Ask YAGO for a random father of a in YAGO 
+    \STATE $a \leftarrow a_{YAGO}$ 
+    \ENDWHILE
+    \STATE $a^* \leftarrow rand.article(A\setminus A_{visited})$
+    \WHILE {$S_W(a^*,a)\notin I$}
+    \STATE $a^*\leftarrow rand.article(A\setminus A_{visited})$
+    \ENDWHILE
+    \STATE $ A^* \leftarrow A^* \cup \{a_{YAGO}\}$
+    \ENDWHILE
+    \RETURN $A^*$
+  \end{algorithmic}
+\end{algorithm}
+
+-serendipity in our recommander system (button : how to use it ?)
+-algorithm for the choice of 'serendipity (How to chose I ?)
 \subsubsection{Similarity}
 
--choix de I
+-choice of I
 
-\subsubsection{Ontology}
-
--parcours de l'Ontology
 
 \section{Candidate Ranking}
 
 \subsection{possible input in neural network}
+
 \subsubsection{Category vector}
+
+One of the very accessible tool to analyze a wikipedia page is(, as we mentioned ?), the use of the categories assigned to each page that can be obtained through the Wikipedia API.
+Only looking at some often viewed wikipedia page, would have us thinking that those categories can act as key word for the article. For example the Michael Jackson wikipedia page has almost a hundred categories, quite diverse :
+ \begin{center}
+	\texttt{"21st-century American singers" "Accidental deaths in California" "African-American choreographers" "African-American rock singers" "African-American songwriters"  "People acquitted of sex crimes"}
+ \end{center}
+
+Nevertheless you would also notice that they are some less relevant categories. The first categories regard the page itself, it's link, it's sources, or even some precise month since it needs clarification.
+
+ \begin{center}
+	\texttt{"All articles with dead external links" "CS1 Spanish-language sources (es)" "Articles with dead external links from July 2013" "Wikipedia articles needing clarification from January 2017"}
+ \end{center}
+But an issue with this strategy may be that some very specific article won't be descripte precisly enough with there category 
+
+
+Categories of the wikipedia page "functors" (in theory of category)
+"Pages using web citations with no URL","Functors","Mathematics navigational boxes"
+
 \subsubsection{Word2Vect and Wikidata}
 
 \subsection{Wide and deep Neural Network}
@@ -267,9 +315,13 @@ Blue arrows represent system's input, orange arrow is for the output. Green arro
 
 The main challenge which has been to be faced is the HTTP requests' efficiency problem. Indeed, the first idea is to get all page links, visit them all and sort them using some pertinence criteria. It was nevertheless technically impossible ; due to the size of HTTP requests, even performed asynchronously, the answer time was huge. \\
 
-The solution developed was to introduce a triple filtering, which consists in three passes going more and more complex and time-expensive. It allowed the module to be able to explore pages to \textit{2-hops} from the original page
+The solution developed was to introduce a triple filtering, which consists in three passes going more and more complex and time-expensive, but on less and less entries. It allowed the module to be able to explore pages to \textit{2-hops} from the original page
 
-\subsubsection{Iterative triple filtering}
+\begin{itemize}
+\item \textit{Title-based filtering} With syntactically simple regular expressions, we can describe the set of hyper links that must be irrelevant. For instance there are years, ISBN codes, image links... All of them can be thrown away without even accessing their HTTP content.
+\item \textit{Popularity-based filtering} In a second time, a probabilistic model has been introduced whose the purpose has been to determine how likely a page was to be liked by the user. \textit{Wikipedia}, through its \textit{API} called \textit{Wikimedia} allows, with a simple HTTP request weighting only a few dozens of characters, to access the views count of a certain page for a certain time lapse. Using it, one can identify connected trending content the user must be interested in.
+\item {Content-based filtering} Finally, the module does its last selection by focusing on articles content. This part is the most expensive, as it is necessary to get the full page content for each remaining article, and to analyze it. This time, one focus on incomplete articles or poorly written (articles containing only a few words for example). \textit{This part could clearly be improved by a deeper text analysis, and probably get way better results.}
+\end{itemize}
 
 \subsection{User interface}
 We started the implementation of an in-browser plugin for Wikipedia suggestion.
