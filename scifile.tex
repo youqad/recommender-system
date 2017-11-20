@@ -129,6 +129,8 @@ Even for an experienced user, browsing this mass of data may be hazardous : wher
 
 For instance when \textit{A. Fleming}, coming back from its holidays in 1928, found its \textit{staphs} culture boxed contaminated by the mushroom \textit{Penicillium Notatum}, from which he was able to extract an antibiotic substance he called penicillin, it was a kind of serendipity process.
 
+The recommendation model which will be detailed in this paper must take account of this crucial notion : the user has to be grabbed out of his comfort zone, to discover and explore themes he may appreciate.
+
 \section{Problem Overview}
 -Wikipedia
 -recommander system
@@ -138,11 +140,9 @@ For instance when \textit{A. Fleming}, coming back from its holidays in 1928, fo
 -Implementation
 (at least)
 
+\section{Retrivial of Candidate articles}
 
-
-\section{Retrieval of Candidate articles}
-
-\subsection{Neighborhood}
+\subsection{Neighbourhood}
 
 Let's try to understand the idea of proximity between two articles. One way to do it is to introduce a potential function telling us the proximity between two articles.
 
@@ -168,17 +168,21 @@ Our attempt to define this potential function uses the set of categories linked 
 \end{rem}
 
 \vspace*{5mm}
-With this definition in mind, let's seek for an output of the ``Retrieval of Candidate Articles''.
+With this definition in mind, let's seek for an output of the ``Retrivial of Candidate Articles''.
 
 
 Let's call $a_c$ the current article.
-Given an subinterval $I$ of $[0,1]$ (define in the serendipity subsection), one way to find candidate articles will be to pick randomly $N$ articles $(a_i)_{1 \leq i \leq N}$ such that:
+Given an subinterval $I$ of $[0,1]$, one way to find candidate articles will be to pick randomly $N$ articles $(a_i)_{1 \leq i \leq N}$ such that:
 \begin{center}
   $\forall i \; S_W(a_c,a_i) \in I$
 \end{center}
 
+In this section, we want to pick articles close to the current one. Therefore, we want that $1 \in I$, i.e $I=[b,1]$ where $b$ depends on the number of categories of $a_c$.
+
+
+
 \vspace*{5mm}
-This approach should work as long as the similarity is precise (in the case of Wikipedia, it means as long as an article have a significant number of categories). Unfortunately, some articles are poorly categorized. Thus, it is not always accurate to use this object.\\
+This approach should work as long as the similarity is precise (in the case of wikipedia, it means as long as an article have a significant number of categories). Unfortunately, some articles are poorly cateorised. Thus, it is not always accurate to use this object.\\
 Therefore, an other approach is needed.
 
 
@@ -188,54 +192,72 @@ Therefore, an other approach is needed.
 
 \subsubsection{Ontology basis}
 
-An other way to solve this problem is to use an Ontology on the Wikipedia articles.
+An other way to solve this problem is to use an Ontology on the wikipedia articles.
 
 \vspace*{5mm}
 \begin{defn}
-  Let $A$ a set of theme. We call $\mathbb{O}$ an Ontology over $A$ a directed tree in which :
+  Let $A$ a set of theme. We call $\mathbb{O}$ an Ontology over $A$ a directed acyclic graph in which :
   \begin{itemize}
   \item $ Node(\mathbb{O}) = A$
-  \item if $t_1$ is a sub-theme of $t_2$ then $(t_1,t_2) \in Edge(\mathbb{O})$
+  \item if $t_1$ is a direct subtheme of $t_2$ then $(t_1,t_2) \in Edge(\mathbb{O})$
   \end{itemize}
 \end{defn}
 
 \vspace*{5mm}
 
 \begin{rem}
-  The relation ``is a sub-theme'' is not transitive.
+  The relation ``is a subtheme'' is not transitive.
 \end{rem}
-
+\vspace*{5mm}
+\newpage
+\begin{exmp}
+\end{exmp}
 \begin{figure}[!h]
-	\centering
-    \includegraphics[scale = 0.3]{ExOntology.pdf}
-    \caption{Ontology over number}
+  \center
+  \includegraphics[scale = 0.3]{ExOntology.pdf}
+  \caption{Ontology over numbers}
 \end{figure}
 
-This kind of structure is available on a YAGO software (Yet An Other Great Ontology). Thus, the building of such an ontology on Wikipedia is not required. In the following, we will suppose that every theme in YAGO matches with an article on Wikipedia. \\
-Now that we have in mind the definition of ontology, let's try to find a way of using it to select articles.\\
 
 
-\begin{algorithm}
+This kind of strucure is available on a YAGO software (Yet An Other Great Ontology). Thus, the building of such an ontology on wikipedia is not required. In the following, we will suppose that every theme in YAGO matches with an article on wikipedia. \\
+
+
+\begin{rem}
+  In reality, there is a surjective function from Wikipedia articles to YAGO Nodes. This property is due to YAGO's construction.
+\end{rem}
+
+Now that we have in mind the definition of ontology, let's try to find a way of using it to select articles. Let's remind that the user gave us a wish for the following article, either specific or general. If $wish = general$ then we will want to pick articles that are above (more general) our current article in the ontology, else (i.e $wish=specific$ ) we will pick articles under the current one. We will pick these articles as followed :
+
+\vspace*{5mm}
+
+\begin{algorithm}[!h]
   \caption{Calculate $A^*$ the selected articles}
   \begin{algorithmic}
-    \REQUIRE $wish \in \{specific , general\}$ , $p_1 \: ,p_2 \in ]0,1[ $, $N \in \mathbb{N}$ , $a_c \in A$
+    \REQUIRE $wish \in \{specific , general\}$ , $N \in \mathbb{N}$ , $a_c \in A$
     \STATE $A^* \leftarrow \emptyset$
-    \WHILE {$ Card(A) \leq N $}
+    \WHILE {$ Card(A^* \setminus A_{visited}) \leq N $}
     \IF {$wish = specific$}
-    \STATE $ r \leftarrow geometric.random(p_1)$
-    \STATE Ask YAGO a for a random son of depth r from $a_c$
+    \STATE $ r \leftarrow geometric.random(0.5)$
+    \STATE Ask YAGO a for a random son of depth $r+1$ from $a_c$
     \STATE $ A^* \leftarrow A^* \cup \{a_{YAGO}\}$
     \ELSE
-    \STATE $ r \leftarrow geometric.random(p_2)$
-    \STATE Ask YAGO a for a random father of depth r from $a_c$
+    \STATE $ r \leftarrow geometric.random(0.5)$
+    \STATE Ask YAGO a for a random father of depth $r+1$ from $a_c$
     \STATE $ A^*  \leftarrow A^* \cup \{a_{YAGO}\}$ 
     \ENDIF
     \ENDWHILE
-    \RETURN $A^*$
+    \RETURN $A^* \setminus A_{visited}$
   \end{algorithmic}
 \end{algorithm}
 
--choix de p1 et p2 dans serendipity
+
+\newpage
+In this algorithm, when we ``Ask YAGO a for a random son of depth $r+1$ from $a_c$'', it means that we pick a random article in YAGO ontology that follows a random walk of length $r+1$ begining on the state $a_c$. In ``Ask YAGO a for a random father of depth $r+1$ from $a_c$'', it is the same random variable but in reversed edges YAGO.
+
+\begin{rem}
+  $r$ follows a geometrical law of parameter 0.5 because we want to be close to our current article in most of the cases.
+\end{rem}
 
 \newpage
 \subsection{serendipity}
@@ -368,8 +390,11 @@ Using Wikipedia official api, we were able to calculate the naive similarity bet
   
 Thus, we were able to experiment this distance over a set of web pages. We can thus qualitatively test this algorithm. It is not really hard to get examples where this calculation is irrelevant (for example, Michael Jackson is closer to France than Paris, cf. Figure \ref{fig:similarity}), but still, on many examples, it gives a trend that fits with the intuition.
 
-\begin{figure}
-    \caption{Comparison of some pages of Wikipedia (cf definition \ref{definition:S_w})}
+\subsection{Using word2vec}
+
+
+\begin{figure}[hb]
+    \caption{Comparison of some pages of Wikipedia (cf. definition \ref{definition:S_w})}
     \label{fig:similarity}
 	\centering
 	\begin{tabular}{c|c|c}
