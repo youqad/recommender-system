@@ -204,7 +204,7 @@ $S_W$ seems to present more details than $S_C$ because in general, notions refer
 
 \subsection{Ontology}
 \subsubsection{Construction of the ontology}
-Since the distance is given, we have to choice articles to give to \textit{John}. Because we want to introduce serendipity, we cannot just look at near articles : they would not be far enough.\\ 
+Since the distance is given, we have to choice articles to give to \textit{John}. Unfortunately, this model will have troubles with introducing serendipity.\\
 A way to solve this problem is to use an Ontology on the wikipedia articles.
 
 \vspace*{5mm}
@@ -464,9 +464,7 @@ The collaborative approach aims to find similarities between the user profiles. 
 \textbf{Content-based: }\\ 
 It consist on sequentially find content using past data items as an user's profile. Thus the goal is to find similarities between what an user liked and new items to recommend. It implies to have a good representation of items and good criteria to traduce an user's references. In general, data is represented using a vector space model.\\
 Some systems use both content-based and collaborative filtering to try to avoid the drawbacks of each approach. We only use the content-based approach. Thus we need to evaluate the relatedness between two articles, which is a kind of distance, and use properly the user's feedbacks.\\
-To determine which articles we propose, we use neural networks.\\
-
-TODO neural networks state of the art
+To determine which articles we propose, we use two kinds of neural networks.Deep neural networks (DNN) were first used for speech recognition and are now currently used to solve problems like picture recognition or classification in general. We use this type of neural network as well as a wide neural network in the filtering step to rank candidates.
 
 \bibliography{scibib}
 
