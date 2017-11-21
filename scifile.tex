@@ -100,11 +100,7 @@
 Abstract: (pas finalisé)\\
 
 Recommendation systems use data treatment techniques in order to do personal recommendations on informations or products. These systems are having a notorious success on the web. However, due to the global increasing amount of information, they are facing a tough challenge : they must be able to produce high-quality recommendations on large scale problems. \\
-In this paper we present a client side web-extension for \textit{Wikipedia}. We aim to create and implement a recommender system which could face two problems. For a given user, we would like to propose articles he is likely to be interested in. On the other hand, we also would like to introduce serendipity in order to help the user discovering new subjects he wouldn't have though about, with the help of reinforcement learning.\\ \\
-
-  TO DO : Abstract\\
-  Younesse : Github -> Overleaf sync test\\
-  Younesse : Overleaf -> Github sync test
+In this paper we present a client side web-extension for \textit{Wikipedia}. We aim to create and implement a recommender system which could face two problems. For a given user, we would like to propose articles he is likely to be interested in. On the other hand, we also would like to introduce serendipity in order to help the user discovering new subjects he wouldn't have though about, with the help of reinforcement learning.
 \end{sciabstract}
 
 
@@ -460,9 +456,17 @@ Thus, we were able to experiment this distance over a set of web pages. We can t
 \end{figure}
 
 
-\section{State of the Art}
+\section{Related Work}
+%Recommendation systems
+Recently, recommending web objects such as videos or news involved more research, like Youtube, Yahoo! News for instance. Based on literature content, recommendation systems can be roughly divided in two parts: content-based filtering and collaborating filtering approaches.\\
+\textbf{Collaborative: }\\
+The collaborative approach aims to find similarities between the user profiles. Users with similar preferences will be grouped and share their information. Then a single user's recommendations will be based on the information existing inside the group.\\
+\textbf{Content-based: }\\ 
+It consist on sequentially find content using past data items as an user's profile. Thus the goal is to find similarities between what an user liked and new items to recommend. It implies to have a good representation of items and good criteria to traduce an user's references. In general, data is represented using a vector space model.\\
+Some systems use both content-based and collaborative filtering to try to avoid the drawbacks of each approach. We only use the content-based approach. Thus we need to evaluate the relatedness between two articles, which is a kind of distance, and use properly the user's feedbacks.\\
+To determine which articles we propose, we use neural networks.\\
 
-
+TODO neural networks state of the art
 
 \bibliography{scibib}
 
