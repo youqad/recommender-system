@@ -30,6 +30,7 @@
 \newtheorem{defn}{Definition}[section]
 \newtheorem{conj}{Conjecture}[section]
 \newtheorem{exmp}{Example}[section]
+\newtheorem{pro}{Property}
 
 \theoremstyle{remark}
 \newtheorem*{rem}{Remark}
@@ -96,6 +97,11 @@
 % Place your abstract within the special {sciabstract} environment.
 
 \begin{sciabstract}
+Abstract: (pas finalisé)\\
+
+Recommendation systems use data treatment techniques in order to do personal recommendations on informations or products. These systems are having a notorious success on the web. However, due to the global increasing amount of information, they are facing a tough challenge : they must be able to produce high-quality recommendations on large scale problems. \\
+In this paper we present a client side web-extension for \textit{Wikipedia}. We aim to create and implement a recommender system which could face two problems. For a given user, we would like to propose articles he is likely to be interested in. On the other hand, we also would like to introduce serendipity in order to help the user discovering new subjects he wouldn't have though about, with the help of reinforcement learning.\\ \\
+
   TO DO : Abstract\\
   Younesse : Github -> Overleaf sync test\\
   Younesse : Overleaf -> Github sync test
@@ -107,9 +113,9 @@
 
 \section*{Introduction}
 
-Since a few decades, recommender systems have been everywhere ; from audiovisual services like \textit{YouTube} or \textit{Deezer} with the \textit{"Flow"}, to market platforms like \textit{Amazon}, or through apps stores or even web browsers, about everyone uses at least one of them every day. 
+Since a few decades, recommender systems have been present almost everywhere ; from audiovisual services like \textit{YouTube} or \textit{Deezer} with the \textit{"Flow"}, to market platforms like \textit{Amazon}, or through apps stores or even web browsers, about everyone uses at least one of them every day. 
 
-They usually consist in algorithms that, given user previous selections (content streamed, words searched or items bought), try to guess which content is likely to be selected by the user next. \\
+Given user previous selections (content streamed, words searched or items bought),they usually consist in algorithms that try to guess which content is likely to be selected by the user next. \\
 
 With statistical learning comes a natural approach to this problem : for each user \textit{John}, the system aims to train a model which tends to fit the user tastes, to be able to deliver good predictions. One of the easiest and most natural way to apply that is to find the users whose tastes are the closest to \textit{John}'s ones. Then, by simply watching at their advice on an asked product, this is easy to get an idea about how it will be likely to be appreciated by \textit{John}.
 
@@ -127,22 +133,27 @@ Even for an experienced user, browsing this mass of data may be hazardous : wher
 \textit{"Serendipity means a 'fortunate happenstance' or 'pleasant surprise'." } \textbf{- Wikipedia}
 \end{center}
 
-For instance when \textit{A. Fleming}, coming back from its holidays in 1928, found its \textit{staphs} culture boxed contaminated by the mushroom \textit{Penicillium Notatum}, from which he was able to extract an antibiotic substance he called penicillin, it was a kind of serendipity process.
+For instance when \textit{A. Fleming}, coming back from its holidays in 1928, found its \textit{staphs} culture boxes contaminated by the mushroom \textit{Penicillium Notatum}, from which he was able to extract an antibiotic substance he called penicillin, it was a kind of serendipity process.
 
 The recommendation model which will be detailed in this paper must take account of this crucial notion : the user has to be grabbed out of his comfort zone, to discover and explore themes he may appreciate.
 
 \section{Problem Overview}
--Wikipedia
--recommander system
--serendipity (def)
--questions : like/dislike, specific/general
--NN
--Implementation
+
+\textbf{Wikipedia}
+
+
+-Wikipedia\\
+-recommander system\\
+-serendipity (def)\\
+-questions : like/dislike, specific/general\\
+-NN\\
+-Implementation\\
 (at least)
 
 \section{Retrivial of Candidate articles}
 
-\subsection{Neighbourhood}
+
+\subsection{Distances on articles}
 
 Let's try to understand the idea of proximity between two articles. One way to do it is to introduce a potential function telling us the proximity between two articles.
 
@@ -159,12 +170,12 @@ Our attempt to define this potential function uses the set of categories linked 
   Let $a_1$ and $a_2$ be two articles. We call $C_1$ (resp. $C_2$) the set of categories linked to $a_1$ (resp. $a_2$).
   We define the similarity of $a_1$ and $a_2$ the following quantity:\\
   \begin{equation*}
-    S_W(a_1,a_2) = \frac{Card(C_1 \cap C_2)}{min(Card(C_1),Card(C_2))}
+    S_C(a_1,a_2) = \frac{Card(C_1 \cap C_2)}{min(Card(C_1),Card(C_2))}
   \end{equation*}
 \end{defn}
 
 \begin{rem}
-  $\forall a_1\: a_2,\; S_W(a_1,a_2) \in [0,1]$
+  $\forall a_1\: a_2,\; S_C(a_1,a_2) \in [0,1]$
 \end{rem}
 
 \vspace*{5mm}
@@ -174,7 +185,7 @@ With this definition in mind, let's seek for an output of the ``Retrivial of Can
 Let's call $a_c$ the current article.
 Given an subinterval $I$ of $[0,1]$, one way to find candidate articles will be to pick randomly $N$ articles $(a_i)_{1 \leq i \leq N}$ such that:
 \begin{center}
-  $\forall i \; S_W(a_c,a_i) \in I$
+  $\forall i \; S_C(a_c,a_i) \in I$
 \end{center}
 
 In this section, we want to pick articles close to the current one. Therefore, we want that $1 \in I$, i.e $I=[b,1]$ where $b$ depends on the number of categories of $a_c$.
@@ -182,17 +193,23 @@ In this section, we want to pick articles close to the current one. Therefore, w
 
 
 \vspace*{5mm}
-This approach should work as long as the similarity is precise (in the case of wikipedia, it means as long as an article have a significant number of categories). Unfortunately, some articles are poorly cateorised. Thus, it is not always accurate to use this object.\\
+This approach should work as long as the similarity is precise (in the case of wikipedia, it means as long as an article have a significant number of categories). Unfortunately, some articles are poorly categorised. Moreover, many articles have hidden categories which does not reflects their content. \\
 Therefore, an other approach is needed.
 
 
+\subsubsection{Another distance using word2vect}
+The word2vect tool is useful to define distance : because articles are dived into a vectorial space, we can use the traditional tool on them. \\
+To compare 2 articles, we assumed that the introduction was quite relevant regarding their similarity. We thus defined the following similarity:
+$$S_W(a,a') = 1- \frac{1 - cos(V_a,V_{a'})}{2}= 1-\frac{1-\frac{V_a.V_{a'}}{||V_a||||V_{a'}||}}{2}$$
+where : $V_a = \frac{\sum_{\omega\in intro_a}u_\omega f_\omega}{\sum_{\omega\in intro_a}f_\omega}$ and $u_\omega$ is the vector given by word2vect for the word $\omega$ and $f_\omega$ is the frequence of the word $\omega$ in the introduction of $a$.\\
+We weight the words depending on their frequence, and then take the sum to associate them a unique vector. This gives a unique vector computed from the introduction of an article $a$.\\
+$S_W$ seems to present more details than $S_C$ because in general, notions referring to an article are mentioned in the introduction. 
 
 
-
-
-\subsubsection{Ontology basis}
-
-An other way to solve this problem is to use an Ontology on the wikipedia articles.
+\subsection{Ontology}
+\subsubsection{Construction of the ontology}
+Since the distance is given, we have to choice articles to give to \textit{John}. Because we want to introduce serendipity, we cannot just look at near articles : they would not be far enough.\\ 
+A way to solve this problem is to use an Ontology on the wikipedia articles.
 
 \vspace*{5mm}
 \begin{defn}
@@ -219,77 +236,112 @@ An other way to solve this problem is to use an Ontology on the wikipedia articl
 \end{figure}
 
 
+This kind of structure is already available on a YAGO software (Yet An Other Great Ontology). However, this ontology is made from Wikipedia, but does not ensure the existence of an onto mapping from the set of articles of Wikipedia into YAGO.\\
+The idea here is to use the wish of \textit{John} (specific or general) in order to construct an ontology over the articles he already read. Indeed, the goal will be to classify the articles among the partial order : \textit{"is more general than"}.To properly construct our structure, we have to ensure that articles proposed to \textit{John} avoid a cycle. Thus our recommander system will have to follow the property : 
 
-This kind of strucure is available on a YAGO software (Yet An Other Great Ontology). Thus, the building of such an ontology on wikipedia is not required. In the following, we will suppose that every theme in YAGO matches with an article on wikipedia. \\
+\begin{pro}
+The relation \textit{"is more general than"} induced by the constructed ontology is transitive. 
+\end{pro}
 
-
-\begin{rem}
-  In reality, there is a surjective function from Wikipedia articles to YAGO Nodes. This property is due to YAGO's construction.
-\end{rem}
+This would ensure to have no cycle. The aim of the system is to construct a relation which is the nearest possible as \textit{"is more general than"}, using the wish of the user. More precisely, our ontology will be a \textbf{forest}.\\
 
 Now that we have in mind the definition of ontology, let's try to find a way of using it to select articles. Let's remind that the user gave us a wish for the following article, either specific or general. If $wish = general$ then we will want to pick articles that are above (more general) our current article in the ontology, else (i.e $wish=specific$ ) we will pick articles under the current one. We will pick these articles as followed :
 
-\vspace*{5mm}
-
-\begin{algorithm}[!h]
-  \caption{Calculate $A^*$ the selected articles}
-  \begin{algorithmic}
-    \REQUIRE $wish \in \{specific , general\}$ , $N \in \mathbb{N}$ , $a_c \in A$
-    \STATE $A^* \leftarrow \emptyset$
-    \WHILE {$ Card(A^* \setminus A_{visited}) \leq N $}
-    \IF {$wish = specific$}
-    \STATE $ r \leftarrow geometric.random(0.5)$
-    \STATE Ask YAGO a for a random son of depth $r+1$ from $a_c$
-    \STATE $ A^* \leftarrow A^* \cup \{a_{YAGO}\}$
-    \ELSE
-    \STATE $ r \leftarrow geometric.random(0.5)$
-    \STATE Ask YAGO a for a random father of depth $r+1$ from $a_c$
-    \STATE $ A^*  \leftarrow A^* \cup \{a_{YAGO}\}$ 
-    \ENDIF
-    \ENDWHILE
-    \RETURN $A^* \setminus A_{visited}$
-  \end{algorithmic}
-\end{algorithm}
-
-
-\newpage
-In this algorithm, when we ``Ask YAGO a for a random son of depth $r+1$ from $a_c$'', it means that we pick a random article in YAGO ontology that follows a random walk of length $r+1$ begining on the state $a_c$. In ``Ask YAGO a for a random father of depth $r+1$ from $a_c$'', it is the same random variable but in reversed edges YAGO.
-
-\begin{rem}
-  $r$ follows a geometrical law of parameter 0.5 because we want to be close to our current article in most of the cases.
-\end{rem}
-
-\newpage
-\subsection{serendipity}
-\subsection{Serendipity}
-
-In the previous algorithm, the set of candidate articles was chosen among the nearest neighbors in the ontology of YAGO.
-In order to recommand to the user articles far from its habits, we present here another way to find articles, depending on the 'serendipity' factor I.
 \begin{algorithm}
   \caption{Calculate $A^*$ the selected articles}
   \begin{algorithmic}
-    \REQUIRE $wish \in \{specific , general\}$ , $N \in \mathbb{N}$, $c \in \mathbb{N}$, $a_c\in A$
+    \REQUIRE $wish \in \{specific , general\}$ , $N \in \mathbb{N}$ , $a_c \in A$, $\mathbb{O}$ ontology
     \STATE $A^* \leftarrow \emptyset$
-    \WHILE {$Card(A^*)\leq N$}
-    \WHILE {$Card(Cat_{YAGO}(a))\leq c$}
-    \STATE Ask YAGO for a random father of a in YAGO 
-    \STATE $a \leftarrow a_{YAGO}$ 
-    \ENDWHILE
-    \STATE $a^* \leftarrow rand.article(A\setminus A_{visited})$
-    \WHILE {$S_W(a^*,a)\notin I$}
-    \STATE $a^*\leftarrow rand.article(A\setminus A_{visited})$
-    \ENDWHILE
-    \STATE $ A^* \leftarrow A^* \cup \{a_{YAGO}\}$
+    \WHILE {$ Card(A^*) \leq N $}
+    \IF {$wish = specific$}
+    \STATE $a_l \leftarrow $random leaf of $a_c$ in $\mathbb{O}$
+    \STATE $a \leftarrow$ random article such that $(a,a_l) \in Edge(\mathbb{O})$ and $a \notin A_{visited}$
+    \STATE $ A^*  \leftarrow A^* \cup \{a\}$
+    \ELSE 
+    \STATE $ r \leftarrow geometric.random(0.5)$
+    \STATE $a_f \leftarrow $ random ancestor of depth $r+1$ from $a_c$
+    \STATE $a \leftarrow $ random article such that $(a,a_f) \in Edge(\mathbb{O})$ and $a \notin A_{visited}$
+    \STATE $ A^*  \leftarrow A^* \cup \{a\}$ 
+    \ENDIF
     \ENDWHILE
     \RETURN $A^*$
   \end{algorithmic}
 \end{algorithm}
 
--serendipity in our recommander system (button : how to use it ?)
--algorithm for the choice of 'serendipity (How to chose I ?)
-\subsubsection{Similarity}
+\newpage
 
--choice of I
+
+Here, $A_{visited}$ is the set of articles already visited : they are the nodes of $\mathbb{O}$ and $A$ the set of articles in Wikipedia in the selected language.\\\\
+In this algorithm, when we ``Look for a random ancestor of depth $r+1$ from $a_c$'', it means that we pick a random article in the ontology already constructed $\mathbb{O}$ that follows a random walk of length $r+1$ begining on the state $a_c$.Like $\mathbb{O}$ is assumed to be a \textbf{forest}, these calls makes sense. 
+\begin{rem}
+  $r$ follows a geometrical law of parameter 0.5 because we want to be close to our current article in most of the cases.\\
+\end{rem}
+\textbf{Random pick}
+\begin{itemize}
+\item Articles are picked randomly in the page of an ancestor. However, most of these links are generally poor of interest. A way to avoid them will be described in the \textbf{implementation}.
+\item Also, to take advantage of the wish of \textit{John}, we also may assume that in a Wikipedia page, general links are more likely to be in the introduction whereas specific (in reference to the current one) one are in the body. The choice of the article in both cases may follow this assumption to be more accurate.  
+\end{itemize}
+
+We then modify the ontology depending on the choice of the neural network and \textit{John}: 
+
+\begin{algorithm}
+	\caption{Actualize $\mathbb{O}$}
+	\begin{algorithmic}
+		\REQUIRE $\mathbb{O} \: previous \: ontology$, $A^* \: selected \: articles$
+		\STATE $a\leftarrow NNcall(A^*)$
+		\STATE Add the leaf $a$ in $\mathbb{O}$, attached to the article it was linked to
+	\end{algorithmic}
+\end{algorithm}
+		
+The new problem here is the lack of serendipity in our model. 
+
+\subsubsection{The serendipity in the ontology}
+
+In the previous algorithm, the set of candidate articles was chosen among the nearest neighbors in the constructed ontology.
+In order to recommand to the user articles far from its habits, we present here another way to find articles, depending on the 'serendipity' factor I.\\
+This algorithm presented below is an adaptation of the one above, which takes in account the serendipity factor, defined previously by the user thanks to the cursor serendipity bar. \\
+Here is an algorithm which will select a article by serendipity, according to the importance given to it by \textit{John}. In that case, the wish (particular or general) is forgotten : it aims to get an article with no relation. 
+
+\begin{algorithm}
+  \caption{Calculate $A^*$ the selected articles}
+  \begin{algorithmic}
+    \REQUIRE $N \in \mathbb{N}$, $c \in \mathbb{N}$, $a_c\in A$
+    \STATE $A^* \leftarrow \emptyset$
+    \WHILE {$Card(A^*)\leq N$}
+    \STATE Pick a random root of $\mathbb{O}$, $a_R$
+    \STATE $a \leftarrow rand.article(A\setminus A_{visited})$
+    \WHILE {$S_W(a_R,a)\notin I$}
+    \STATE $a 
+    \leftarrow rand.article(A\setminus A_{visited})$
+    \ENDWHILE
+    \STATE $ A^* \leftarrow A^* \cup {\{a}\}$
+    \ENDWHILE
+    \RETURN $A^*$
+  \end{algorithmic}
+\end{algorithm}
+
+We pick random articles which match with a root of the ontology, but not too much, in order to keep the serendipity. The cursor bar influence the value of $I$, which must contain $0$ and such that the bound is well defined. This have to be studied in practice. According to $S_W$, and that the cursor of the bar is in $0,1$, $I=[0,\frac{1}{2}c]$ where $c$ is the cursor may be a good value (cf the tests of the similarity).\\
+The value $0$ is kept because the neural network will take the nicest link and return it to John.\\\\
+
+\textbf{Random pick}\\
+In order to be more deterministic and accurate, we chose articles by popularity instead of randomness : popular articles will thus serves as a 'base' of articles, and the 'wish' of \textit{John} will help to propose him more specific and maybe unpopular ones.\\
+
+
+The actualization of the ontology now create a new root, because \textit{John} has chosen an article which cannot be compared with another one, a priori. 
+\begin{algorithm}[h!]
+	\caption{Actualize $\mathbb{O}$ for serendipity}
+	\begin{algorithmic}
+		\REQUIRE $\mathbb{O} \: previous \: ontology$, $A^* \: selected \: articles$
+		\STATE $a\leftarrow NNcall(A^*)$
+		\STATE Create a new root in $\mathbb{O}$
+	\end{algorithmic}
+\end{algorithm}
+
+By these two constructions on $\mathbb{O}$, the two cases ensures that at any time $\mathbb{O}$ is indeed a forest. \\\\
+
+\begin{rem}[Cold start]
+Here, the cold start is problematic because at the beginning we have no idea about the preferences of \textit{John}. In a first time, we will then propose him random articles, and more precisely articles among the most popular ones. 
+\end{rem}
 
 
 \section{Candidate Ranking}
