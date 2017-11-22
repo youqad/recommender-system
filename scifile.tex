@@ -97,10 +97,10 @@
 % Place your abstract within the special {sciabstract} environment.
 
 \begin{sciabstract}
-Abstract: (pas finalisé)\\
+Abstract:\\
 
-Recommendation systems use data treatment techniques in order to do personal recommendations on informations or products. These systems are having a notorious success on the web. However, due to the global increasing amount of information, they are facing a tough challenge : they must be able to produce high-quality recommendations on large scale problems. \\
-In this paper we present a client side web-extension for \textit{Wikipedia}. We aim to create and implement a recommender system which could face two problems. For a given user, we would like to propose articles he is likely to be interested in. On the other hand, we also would like to introduce serendipity in order to help the user discovering new subjects he wouldn't have though about, with the help of reinforcement learning.
+Recommendation systems use data treatment techniques in order to do personal recommendations on informations or products. Such systems are having a notorious success on the web. However, due to the global increasing amount of information, they are facing a tough challenge : they must be able to produce high-quality recommendations on large scale problems. \\
+In this paper we present a client side web-extension for \textit{Wikipedia}. We aim to create and implement a recommender system which could face two problems. For a given user, we would like to propose articles he is likely to be interested in. On the other hand, we also would like to introduce serendipity in order to help the user discovering new subjects he wouldn't have thought about, with the help of reinforcement learning.
 \end{sciabstract}
 
 
@@ -135,7 +135,23 @@ The recommendation model which will be detailed in this paper must take account 
 
 \section{Problem Overview}
 
-\textbf{Wikipedia}
+Our goal is to design a client side web-extension for \textit{Wikipedia} in order to help a user \textit{John} find interesting articles. \\
+
+First of all we know nothing about \textit{John} at the very beginning. Thus our application must provide a user interface, so that we can get \textit{John}'s feedback about the articles. The more we ask, the more we know but the less ergonomic it is. We must only ask  a few simple questions so that our application is comfortable to use and not invasive on the screen. Details about the user interface are given in section 4. \\
+
+Now that we know more about \textit{John} we will guess his domains of interest. No revolutional idea : we will try do so using some neural network and the feedback of the articles previously read. However \textit{John}'s tastes may change over time, so our application must adapt : it must constantly refine its guess about \textit{John}'s tastes by taking into account the feedback on the articles read recently. Not all neural networks will be suitable for the task. The description of the neural network we used is developed in section 3. \\
+
+Even if we succeed in finding \textit{John}'s interests theoretically, some practical considerations must not be sidelined.
+
+-------
+
+We do not want to give \textit{John} any random article and it is likely that \textit{John} is not interested in that either. The bottleneck of this issue is that we must find articles which are likely to be interesting in John's eyes.
+
+First it means that 
+
+
+
+We sure want these articles to be relevant.  What is relevant is to find articles that \textit{John} would have loved to discover 
 
 
 -Wikipedia\\
@@ -146,7 +162,7 @@ The recommendation model which will be detailed in this paper must take account 
 -Implementation\\
 (at least)
 
-\section{Retrivial of Candidate articles}
+\section{Retrieval of candidate articles}
 
 
 \subsection{Distances on articles}
@@ -163,6 +179,7 @@ Our attempt to define this potential function uses the set of categories linked 
 
 \vspace*{5mm}
 \begin{defn}
+  \label{definition:S_w}
   Let $a_1$ and $a_2$ be two articles. We call $C_1$ (resp. $C_2$) the set of categories linked to $a_1$ (resp. $a_2$).
   We define the similarity of $a_1$ and $a_2$ the following quantity:\\
   \begin{equation*}
@@ -204,7 +221,7 @@ $S_W$ seems to present more details than $S_C$ because in general, notions refer
 
 \subsection{Ontology}
 \subsubsection{Construction of the ontology}
-Since the distance is given, we have to choice articles to give to \textit{John}. Unfortunately, this model will have troubles with introducing serendipity.\\
+If the distance model is able to give article to \textit{John}, it  will have troubles with introducing serendipity.\\
 A way to solve this problem is to use an Ontology on the wikipedia articles.
 
 \vspace*{5mm}
@@ -232,7 +249,7 @@ A way to solve this problem is to use an Ontology on the wikipedia articles.
 \end{figure}
 
 
-This kind of structure is already available on a YAGO software (Yet An Other Great Ontology). However, this ontology is made from Wikipedia, but does not ensure the existence of an onto mapping from the set of articles of Wikipedia into YAGO.\\
+This kind of structure is already available on a YAGO software (Yet An Other Great Ontology). Even if this ontology is made from Wikipedia, it does not ensure the existence of an onto mapping from the set of articles of Wikipedia into YAGO.\\
 The idea here is to use the wish of \textit{John} (specific or general) in order to construct an ontology over the articles he already read. Indeed, the goal will be to classify the articles among the partial order : \textit{"is more general than"}.To properly construct our structure, we have to ensure that articles proposed to \textit{John} avoid a cycle. Thus our recommander system will have to follow the property : 
 
 \begin{pro}
@@ -268,7 +285,7 @@ Now that we have in mind the definition of ontology, let's try to find a way of 
 
 
 Here, $A_{visited}$ is the set of articles already visited : they are the nodes of $\mathbb{O}$ and $A$ the set of articles in Wikipedia in the selected language.\\\\
-In this algorithm, when we ``Look for a random ancestor of depth $r+1$ from $a_c$'', it means that we pick a random article in the ontology already constructed $\mathbb{O}$ that follows a random walk of length $r+1$ begining on the state $a_c$.Like $\mathbb{O}$ is assumed to be a \textbf{forest}, these calls makes sense. 
+In this algorithm, when we ``Look for a random ancestor of depth $r+1$ from $a_c$'', it means that we pick a random article in the ontology already constructed $\mathbb{O}$ that follows a random walk of length $r+1$ begining on the state $a_c$. Like $\mathbb{O}$ is assumed to be a \textbf{forest}, these calls are allowed 
 \begin{rem}
   $r$ follows a geometrical law of parameter 0.5 because we want to be close to our current article in most of the cases.\\
 \end{rem}
@@ -368,13 +385,13 @@ Categories of the wikipedia page "functors" (in theory of category)
 \subsection{Wide and deep Neural Network}
 \subsubsection{Wide : memorization/focus}
 \subsubsection{Deep : generalization/serendipity}
-
+ 
 
 \newpage
 
 \section{System architecture}
 
-First, we give a global diagram to expose interactions between the user interface, \textit{Wikipedia} pages, modules and \textit{Wikipedia} APIs. 
+First, this global diagram exposes interactions between the user interface, \textit{Wikipedia} pages, modules and \textit{Wikipedia} APIs. 
 
 \begin{figure}[h!]
 	\centering
@@ -458,13 +475,14 @@ Thus, we were able to experiment this distance over a set of web pages. We can t
 
 \section{Related Work}
 %Recommendation systems
-Recently, recommending web objects such as videos or news involved more research, like Youtube, Yahoo! News for instance. Based on literature content, recommendation systems can be roughly divided in two parts: content-based filtering and collaborating filtering approaches.\\
+Recently, recommending web objects such as videos or news as in Youtube, Yahoo! News for instance involved more research. Based on literature content, recommendation systems can be roughly divided in two parts: content-based filtering and collaborating filtering approaches.\\
 \textbf{Collaborative: }\\
 The collaborative approach aims to find similarities between the user profiles. Users with similar preferences will be grouped and share their information. Then a single user's recommendations will be based on the information existing inside the group.\\
 \textbf{Content-based: }\\ 
-It consist on sequentially find content using past data items as an user's profile. Thus the goal is to find similarities between what an user liked and new items to recommend. It implies to have a good representation of items and good criteria to traduce an user's references. In general, data is represented using a vector space model.\\
-Some systems use both content-based and collaborative filtering to try to avoid the drawbacks of each approach. We only use the content-based approach. Thus we need to evaluate the relatedness between two articles, which is a kind of distance, and use properly the user's feedbacks.\\
-To determine which articles we propose, we use two kinds of neural networks.Deep neural networks (DNN) were first used for speech recognition and are now currently used to solve problems like picture recognition or classification in general. We use this type of neural network as well as a wide neural network in the filtering step to rank candidates.
+This method is based on reinforcement learning, which consist on exploring the space of possibilities and have feedbacks on the choices made. In content-based filtering, we find content using past data items as an user's profile. Thus the goal is to find similarities between what an user liked and new items to recommend. It implies to have a good representation of items and good criteria to traduce an user's references. In general, data is represented using a vector space model.\\
+Some systems use both content-based and collaborative filtering to try to avoid the drawbacks of each approach. We only use the content-based approach. Thus we need to evaluate the relatedness between two articles, which is a kind of distance, and we need also to define and use properly the user's feedbacks.\\
+%Neural networks and reinforcement learning: incomplete
+To explore the space of possibilities we use two types of neural networks. Deep neural networks (DNN) were first used for speech recognition and are now currently used to solve problems like picture recognition or classification in general. We use this type of neural network as well as a wide neural network in the filtering step to rank candidates.
 
 \bibliography{scibib}
 
